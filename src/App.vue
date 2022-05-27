@@ -32,7 +32,7 @@ export default {
       filters: {
         currency: "usd",
         category: "Price",
-        interval: "24h",
+        interval: "1",
       },
       // each filter has a name and a key
       filterKeys: {
@@ -130,7 +130,9 @@ export default {
             case 2: {
               //get todays and a day in the past
               let today = new Date();
-              today.setDate(today.getDate() - this.filterKeys[value]);
+              today.setDate(today.getDate() - this.filters.interval)
+              
+              
               let pastDay =
                 today.getDate() +
                 "-" +
