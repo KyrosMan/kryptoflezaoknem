@@ -1,4 +1,8 @@
 <template>
+  <!--
+    CODE REVIEW:
+    Jsou různé standardy na jména custom komponent - Pascal nebo kebab, ale camel ne :D A není konzistentní s ostatními.
+  -->
   <filterContainer
     @filter-chosen="filterRefresh"
     :filters="filtersData"
@@ -51,6 +55,12 @@ export default {
         "1y": "365",
         "5y": "1825",
       },
+      // CODE REVIEW:
+      // S touto proměnnou mám problém - neměla by být potřeba pokud neděláš něco fakt divného.
+      // Celá pointa Vue je že za tebe řeší re-rendering.
+      // Je to proto že někde selhala reaktivita? To se občas stávalo ve Vue 2,
+      // např. při přidávání nových klíčů (https://v2.vuejs.org/v2/guide/reactivity.html).
+      // Tady hádám že to bude kvůli mutaci computed arraye.
       mainKey: 0, // i use mainKey++ to rerender the containers when a button is clicked
       isLoading: false,
       errorMessage: "",
@@ -175,6 +185,8 @@ export default {
           this.errorMessage =
             "You can only choose 5 filters a minute. Sorry bruh :(( \n Now wait for 30 seconds";
 
+          // CODE REVIEW:
+          // Počítá se tu s limity veřejného API, pěkné 👍
           setTimeout(() => {
             this.isLoading = false;
             this.errorMessage = "";
@@ -183,6 +195,32 @@ export default {
       }
     },
     sortCryptos(value) {
+      /*
+        CODE REVIEW:
+        
+        S touto funkcí mám taky problém - v funkcionálním přístupu Vue ideálně chceme aby data plynuly
+        od zdrojů pravdy(data) až k uživateli(HTML template), a můžeme je po cestě prohnat různými transformacemi(computed),
+        ale to by mělo být stateless.
+        Tady tedy řešíš ty problémy nereactive frameworků - musíš sortCryptos volat sám, je šance že na to zapomeneš...
+              Správně by tedy mělo být
+        1. v data - cryptocurrencies source of truth. API call to může přepsat.
+        2. v data je stav sortu
+        3. v computed je sortnutý pohled na data, sám se aktualizuje když se změní 1. nebo 2.
+        
+        Další věc je - není třeba si sort algoritmus psát sám. Dívám se že v JS je jen in-place sort, nám by se hodil
+        sortBy, ten je třeba v Lodashi: https://lodash.com/docs/4.17.15#sortBy
+        Computed by tedy mohl vypadat takto:
+
+        sortedCryptos() {
+          let key = {
+            "Price": "price",
+            "Risers": "change",
+            "Failers": "change"
+            "Market Cap": "market_cap",
+          }[this.sortCategory] // nebo neco
+          return _.sortBy(this.cryptocurrencies[0], crypto => crypto[key]);
+        }
+      */
       switch (value) {
         case "Price":
           for (let i = 1; i < this.cryptocurrencies[0].length; i++) {
@@ -241,6 +279,8 @@ export default {
     },
   },
   computed: {
+    // CODE REVIEW:
+    // Toto vlastně není computed - na ničem to nezávisí, a ještě do to všude zapisuješ.
     filtersData() {
       // data about buttons
       return [

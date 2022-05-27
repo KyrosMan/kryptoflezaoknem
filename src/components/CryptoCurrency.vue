@@ -38,6 +38,22 @@ export default {
   },
   methods: {
     addSpaces(input) {
+      /*
+        CODE REVIEW:
+
+        Algoritmus vypadá custom, je v pohodě copy-pastovat, s komentářem kde to člověk našel je to pak ideální.
+        Vůbec bych tedy neměl problém s tímto řešením:
+
+        addSpaces(input) {
+          // Found on: https://stackoverflow.com/questions/2901102/how-to-print-a-number-with-commas-as-thousands-separators-in-javascript
+          return input.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+        }
+       
+        A nebo jsem ještě našel:
+
+        input.toLocaleString('cz').replaceAll(',', ' ');
+       */
+
       // add spaces so that a big value like 123456789 looks 123 456 789
       let newString = String(input);
       // do it only if the num is greater than 0
