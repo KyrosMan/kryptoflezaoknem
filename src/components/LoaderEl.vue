@@ -7,6 +7,8 @@
 </template>
 
 <script>
+// CODE REVIEW:
+// Syntax detail - File a komponenta by se měla jmenovat LoaderElement, když se tak také používá.
 
 export default {
   name: "LoaderEl",
